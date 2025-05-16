@@ -107,7 +107,7 @@ class _AppTranslatorState extends State<AppTranslator> {
               'Tradução:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            Text(translatedText, textAlign: TextAlign.center),
+            Text(translatedText, textAlign: TextAlign.left),
             const SizedBox(height: 16),
             DropdownButton<String>(
               value: _selectedLanguage,
