@@ -73,7 +73,7 @@ class _AppTranslatorState extends State<AppTranslator> {
     return Scaffold(
       appBar: AppBar(
         leading: Image.asset('assets/img/translator_leading.png'),
-        title: const Text("flutter_translator"),
+        title: const Text("Translator"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
