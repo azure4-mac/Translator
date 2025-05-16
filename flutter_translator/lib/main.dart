@@ -8,8 +8,38 @@ import 'package:translator/translator.dart';
 
 void main() {
   runApp(
-    const MaterialApp(debugShowCheckedModeBanner: false, home: AppTranslator()),
+    const MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()),
   );
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const AppTranslator()),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0XF004AAD),
+      body: Center(
+        child: Image.asset('assets/img/translator_leading.png', width: 150),
+      ),
+    );
+  }
 }
 
 class AppTranslator extends StatefulWidget {

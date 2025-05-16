@@ -22,8 +22,8 @@ dependencies:
   flutter_native_splash: ^2.3.0  
 
 flutter_native_splash:
-  color: "#ffffff" # Cor de fundo
-  image: assets/img/translator_leading.png # Caminho da sua imagem
+  color: "##004aad" # Cor de fundo
+  image: assets/img/translator_logo.png # Caminho da sua imagem
   android: true
   ios: true
   branding: null
