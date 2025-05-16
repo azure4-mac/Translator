@@ -71,7 +71,10 @@ class _AppTranslatorState extends State<AppTranslator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("flutter_translator")),
+      appBar: AppBar(
+        leading: Image.asset('assets/img/translator_logo.png'),
+        title: const Text("flutter_translator"),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
