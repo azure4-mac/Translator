@@ -40,6 +40,7 @@ flutter:
   # Para adicionar assets (como imagens), descomente e edite abaixo:
   assets:
     - assets/img/translator_logo.png
+    - assets/img/translator_leading.png
   # Para adicionar fontes personalizadas, edite o bloco abaixo:
   # fonts:
   #   - family: NomeDaFonte
