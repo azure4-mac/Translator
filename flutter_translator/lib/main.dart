@@ -130,6 +130,7 @@ class _AppTranslatorState extends State<AppTranslator> {
                 DropdownMenuItem(value: 'en', child: Text('Inglês')),
                 DropdownMenuItem(value: 'ja', child: Text('Japonês')),
                 DropdownMenuItem(value: 'jv', child: Text('Javanês')),
+                DropdownMenuItem(value: 'la', child: Text('Latim')),
                 DropdownMenuItem(value: 'zh-cn', child: Text('Mandarim')),
                 DropdownMenuItem(value: 'mr', child: Text('Marata')),
                 DropdownMenuItem(value: 'pa', child: Text('Punjabi')),
