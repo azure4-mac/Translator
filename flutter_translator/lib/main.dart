@@ -34,9 +34,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0XF004AAD),
+      backgroundColor: Color(0XFF004AAD),
       body: Center(
-        child: Image.asset('assets/img/translator_leading.png', width: 150),
+        child: Image.asset('assets/img/translator_logo.png', width: 125),
       ),
     );
   }
@@ -55,7 +55,7 @@ class _AppTranslatorState extends State<AppTranslator> {
   final ImagePicker picker = ImagePicker();
 
   String translatedText = '';
-  String _selectedLanguage = 'en'; // Idioma padrão: inglês
+  String _selectedLanguage = 'en';
 
   // Tradução do texto digitado
   Future<void> translateText() async {
@@ -102,8 +102,29 @@ class _AppTranslatorState extends State<AppTranslator> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Image.asset('assets/img/translator_leading.png'),
-        title: const Text("Translator"),
+        title: Padding(
+          padding: EdgeInsets.only(right: 36.0),
+          child: Text(
+            'Translator',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        actions: [
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EasterEgg()),
+              );
+            },
+            child: Image.asset('assets/img/translator_logo.png', width: 100),
+          ),
+        ],
+        backgroundColor: const Color(0XFF004AAD),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -112,6 +133,7 @@ class _AppTranslatorState extends State<AppTranslator> {
             const Text("Tradutor de Texto", style: TextStyle(fontSize: 20)),
             const SizedBox(height: 16),
             TextField(
+              maxLength: 4000,
               controller: _textController,
               decoration: const InputDecoration(
                 labelText: 'Digite o texto ou use a câmera',
@@ -125,13 +147,19 @@ class _AppTranslatorState extends State<AppTranslator> {
               children: [
                 ElevatedButton.icon(
                   onPressed: translateText,
-                  icon: const Icon(Icons.translate),
-                  label: const Text("Traduzir"),
+                  icon: const Icon(Icons.translate, color: Color(0XFF004AAD)),
+                  label: const Text(
+                    "Traduzir",
+                    style: TextStyle(color: Color(0XFF004AAD)),
+                  ),
                 ),
                 ElevatedButton.icon(
                   onPressed: pickImageAndTranslate,
-                  icon: const Icon(Icons.camera_alt),
-                  label: const Text("Usar Câmera"),
+                  icon: const Icon(Icons.camera_alt, color: Color(0XFF004AAD)),
+                  label: const Text(
+                    "Usar Câmera",
+                    style: TextStyle(color: Color(0XFF004AAD)),
+                  ),
                 ),
               ],
             ),
@@ -140,7 +168,7 @@ class _AppTranslatorState extends State<AppTranslator> {
               'Tradução:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            Text(translatedText, textAlign: TextAlign.left),
+            SelectableText(translatedText, style: TextStyle(fontSize: 16)),
             const SizedBox(height: 16),
             DropdownButton<String>(
               value: _selectedLanguage,
@@ -176,6 +204,21 @@ class _AppTranslatorState extends State<AppTranslator> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class EasterEgg extends StatelessWidget {
+  const EasterEgg({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Easter Egg', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0XFF004AAD),
+      ),
+      body: Center(child: Image.asset('assets/img/easter_egg.png')),
     );
   }
 }

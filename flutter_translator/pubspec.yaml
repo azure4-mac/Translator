@@ -22,7 +22,7 @@ dependencies:
   flutter_native_splash: ^2.3.0  
 
 flutter_native_splash:
-  color: "##004aad" # Cor de fundo
+  color: "#004aad" # Cor de fundo
   image: assets/img/translator_logo.png # Caminho da sua imagem
   android: true
   ios: true
@@ -51,7 +51,7 @@ flutter:
   # Para adicionar assets (como imagens), descomente e edite abaixo:
   assets:
     - assets/img/translator_logo.png
-    - assets/img/translator_leading.png
+    - assets/img/easter_egg.png
   # Para adicionar fontes personalizadas, edite o bloco abaixo:
   # fonts:
   #   - family: NomeDaFonte
