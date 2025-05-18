@@ -219,6 +219,7 @@ class EasterEgg extends StatelessWidget {
         backgroundColor: const Color(0XFF004AAD),
       ),
       body: Center(child: Image.asset('assets/img/easter_egg.png')),
+      backgroundColor: Colors.white,
     );
   }
 }
