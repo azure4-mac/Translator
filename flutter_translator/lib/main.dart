@@ -7,38 +7,9 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:translator/translator.dart';
 
 void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: const Color(0XFF004AAD),
-        scaffoldBackgroundColor: const Color(0xFFF9F2F8),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Color(0XFF004AAD),
-            side: BorderSide(color: Color(0XFF004AAD)),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-      ),
-      home: const SplashScreen(),
-    );
-  }
+  runApp(
+    const MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()),
+  );
 }
 
 class SplashScreen extends StatefulWidget {
@@ -63,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0XFF004AAD),
+      backgroundColor: Color(0XFF004AAD),
       body: Center(
         child: Image.asset('assets/img/translator_logo.png', width: 125),
       ),
@@ -85,7 +56,6 @@ class _AppTranslatorState extends State<AppTranslator> {
 
   String translatedText = '';
   String _selectedLanguage = 'en';
-  bool isLoading = false;
 
   final List<Map<String, String>> languages = [
     {'value': 'de', 'label': 'Alemão'},
@@ -115,19 +85,13 @@ class _AppTranslatorState extends State<AppTranslator> {
     final input = _textController.text;
     if (input.isEmpty) return;
 
-    setState(() => isLoading = true);
-
     final translation = await translator.translate(
       input,
       to: _selectedLanguage,
     );
     setState(() {
       translatedText = translation.text;
-      isLoading = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Texto traduzido com sucesso!')),
-    );
   }
 
   Future<void> pickImageAndTranslate() async {
@@ -136,21 +100,23 @@ class _AppTranslatorState extends State<AppTranslator> {
 
     final inputImage = InputImage.fromFile(File(pickedFile.path));
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-    final recognizedText = await textRecognizer.processImage(inputImage);
+
+    final RecognizedText recognizedText = await textRecognizer.processImage(
+      inputImage,
+    );
     await textRecognizer.close();
 
     final extractedText = recognizedText.text;
+
     _textController.text = extractedText;
 
     if (extractedText.isNotEmpty) {
-      setState(() => isLoading = true);
       final translation = await translator.translate(
         extractedText,
         to: _selectedLanguage,
       );
       setState(() {
         translatedText = translation.text;
-        isLoading = false;
       });
     }
   }
@@ -159,18 +125,29 @@ class _AppTranslatorState extends State<AppTranslator> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Translator', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0XFF004AAD),
+        title: Padding(
+          padding: EdgeInsets.only(right: 36.0),
+          child: Text(
+            'Translator',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
         actions: [
           InkWell(
-            onTap:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const EasterEgg()),
-                ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EasterEgg()),
+              );
+            },
             child: Image.asset('assets/img/translator_logo.png', width: 100),
           ),
         ],
+        backgroundColor: const Color(0XFF004AAD),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -182,101 +159,145 @@ class _AppTranslatorState extends State<AppTranslator> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 700;
-                return Flex(
-                  direction: isWide ? Axis.horizontal : Axis.vertical,
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Flexible(
-                      flex: 1,
-                      child: Column(
-                        children: [
-                          TextField(
-                            maxLength: 4000,
-                            controller: _textController,
-                            decoration: const InputDecoration(
-                              labelText: 'Digite o texto ou use a câmera',
-                            ),
-                            maxLines: null,
-                          ),
-                          const SizedBox(height: 16),
-                          Wrap(
-                            spacing: 10,
-                            children: [
-                              ElevatedButton.icon(
-                                onPressed: translateText,
-                                icon: const Icon(Icons.translate),
-                                label: const Text("Traduzir"),
-                              ),
-                              ElevatedButton.icon(
-                                onPressed: pickImageAndTranslate,
-                                icon: const Icon(Icons.camera_alt),
-                                label: const Text("Usar Câmera"),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          DropdownButtonFormField<String>(
-                            value: _selectedLanguage,
-                            items:
-                                languages.map((lang) {
-                                  return DropdownMenuItem<String>(
-                                    value: lang['value'],
-                                    child: Text(lang['label']!),
-                                  );
-                                }).toList(),
-                            onChanged: (value) {
-                              setState(() => _selectedLanguage = value!);
-                            },
-                            decoration: const InputDecoration(
-                              labelText: 'Selecione o idioma',
-                            ),
-                          ),
-                        ],
+                    SizedBox(
+                      width: 350,
+                      child: TextField(
+                        maxLength: 4000,
+                        controller: _textController,
+                        decoration: const InputDecoration(
+                          labelText: 'Digite o texto ou use a câmera',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: null,
                       ),
                     ),
-                    const SizedBox(width: 32, height: 32),
-                    Flexible(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Tradução:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 10,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: translateText,
+                          icon: const Icon(
+                            Icons.translate,
+                            color: Color(0XFF004AAD),
                           ),
-                          const SizedBox(height: 8),
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            width: double.infinity,
-                            height: 300,
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child:
-                                isLoading
-                                    ? const Center(
-                                      child: CircularProgressIndicator(),
-                                    )
-                                    : SelectableText(
-                                      translatedText,
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
+                          label: const Text(
+                            "Traduzir",
+                            style: TextStyle(color: Color(0XFF004AAD)),
                           ),
-                        ],
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: pickImageAndTranslate,
+                          icon: const Icon(
+                            Icons.camera_alt,
+                            color: Color(0XFF004AAD),
+                          ),
+                          label: const Text(
+                            "Usar Câmera",
+                            style: TextStyle(color: Color(0XFF004AAD)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+
+                // Coluna da Direita: Tradução
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Tradução:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 350,
+                      height: 300,
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: SelectableText(
+                        translatedText,
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ),
                   ],
-                );
-              },
+                ),
+              ],
+            ),
+            Center(
+              child: SizedBox(
+                width: 200,
+                child: Autocomplete<String>(
+                  optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text.isEmpty) {
+                      return const Iterable<String>.empty();
+                    }
+                    return languages
+                        .map((lang) => lang['label']!)
+                        .where(
+                          (label) => label.toLowerCase().contains(
+                            textEditingValue.text.toLowerCase(),
+                          ),
+                        );
+                  },
+                  onSelected: (String selection) {
+                    final selectedLang = languages.firstWhere(
+                      (lang) => lang['label'] == selection,
+                      orElse: () => {'value': '', 'label': ''},
+                    );
+
+                    setState(() {
+                      _selectedLanguage = selectedLang['value']!;
+                    });
+                  },
+                  fieldViewBuilder: (
+                    context,
+                    controller,
+                    focusNode,
+                    onEditingComplete,
+                  ) {
+                    return TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      decoration: const InputDecoration(
+                        labelText: 'Selecione o idioma',
+                        border: OutlineInputBorder(),
+                      ),
+                      onEditingComplete: onEditingComplete,
+                    );
+                  },
+                ),
+              ),
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Idioma selecionado: $_selectedLanguage',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -292,7 +313,7 @@ class EasterEgg extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Easter Egg', style: TextStyle(color: Colors.white)),
+        title: Text('Easter Egg', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0XFF004AAD),
       ),
       body: Center(child: Image.asset('assets/img/easter_egg.png')),
