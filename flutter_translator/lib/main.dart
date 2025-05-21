@@ -167,7 +167,7 @@ class _AppTranslatorState extends State<AppTranslator> {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
                       width: 350,
