@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:translator/translator.dart';
@@ -151,39 +152,89 @@ class _AppTranslatorState extends State<AppTranslator> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Tradutor de Texto",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 350,
-                      child: TextField(
-                        maxLength: 4000,
-                        controller: _textController,
-                        decoration: const InputDecoration(
-                          labelText: 'Digite o texto ou use a câmera',
-                          border: OutlineInputBorder(),
-                        ),
-                        maxLines: null,
+        child: Center(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              bool isWide = constraints.maxWidth > 600;
+
+              Widget inputColumn = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 300,
+                    height: 300,
+                    child: TextField(
+                      maxLength: 4000,
+                      maxLines: null,
+                      controller: _textController,
+                      decoration: const InputDecoration(
+                        labelText: 'Digite o texto ou use a câmera',
+                        border: OutlineInputBorder(),
+                        counterText: '',
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 10,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              );
+
+              Widget outputColumn = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 300,
+                    height: 300,
+                    child: TextField(
+                      readOnly: true,
+                      maxLines: null,
+                      controller: TextEditingController(text: translatedText),
+                      decoration: const InputDecoration(
+                        labelText: 'Tradução',
+                        border: OutlineInputBorder(),
+                      ),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              );
+
+              Widget mainContent;
+
+              if (isWide) {
+                mainContent = Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    inputColumn,
+                    const SizedBox(width: 32),
+                    outputColumn,
+                  ],
+                );
+              } else {
+                mainContent = Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    inputColumn,
+                    const SizedBox(height: 24),
+                    outputColumn,
+                  ],
+                );
+              }
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Tradutor de Texto",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 24),
+                  mainContent,
+                  const SizedBox(height: 24),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         ElevatedButton.icon(
                           onPressed: translateText,
@@ -196,6 +247,7 @@ class _AppTranslatorState extends State<AppTranslator> {
                             style: TextStyle(color: Color(0XFF004AAD)),
                           ),
                         ),
+                        Padding(padding: EdgeInsets.only(left: 16)),
                         ElevatedButton.icon(
                           onPressed: pickImageAndTranslate,
                           icon: const Icon(
@@ -209,97 +261,63 @@ class _AppTranslatorState extends State<AppTranslator> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-
-                // Coluna da Direita: Tradução
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Tradução:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 350,
-                      height: 300,
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: SelectableText(
-                        translatedText,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Center(
-              child: SizedBox(
-                width: 200,
-                child: Autocomplete<String>(
-                  optionsBuilder: (TextEditingValue textEditingValue) {
-                    if (textEditingValue.text.isEmpty) {
-                      return const Iterable<String>.empty();
-                    }
-                    return languages
-                        .map((lang) => lang['label']!)
-                        .where(
-                          (label) => label.toLowerCase().contains(
-                            textEditingValue.text.toLowerCase(),
-                          ),
-                        );
-                  },
-                  onSelected: (String selection) {
-                    final selectedLang = languages.firstWhere(
-                      (lang) => lang['label'] == selection,
-                      orElse: () => {'value': '', 'label': ''},
-                    );
-
-                    setState(() {
-                      _selectedLanguage = selectedLang['value']!;
-                    });
-                  },
-                  fieldViewBuilder: (
-                    context,
-                    controller,
-                    focusNode,
-                    onEditingComplete,
-                  ) {
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: const InputDecoration(
-                        labelText: 'Selecione o idioma',
-                        border: OutlineInputBorder(),
-                      ),
-                      onEditingComplete: onEditingComplete,
-                    );
-                  },
-                ),
-              ),
-            ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Idioma selecionado: $_selectedLanguage',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
                   ),
-                ),
-              ),
-            ),
-          ],
+                  Padding(padding: EdgeInsets.only(top: 16)),
+                  SizedBox(
+                    width: 300,
+                    child: Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        if (textEditingValue.text.isEmpty) {
+                          return const Iterable<String>.empty();
+                        }
+                        return languages
+                            .map((lang) => lang['label']!)
+                            .where(
+                              (label) => label.toLowerCase().contains(
+                                textEditingValue.text.toLowerCase(),
+                              ),
+                            );
+                      },
+                      onSelected: (String selection) {
+                        final selectedLang = languages.firstWhere(
+                          (lang) => lang['label'] == selection,
+                          orElse: () => {'value': '', 'label': ''},
+                        );
+
+                        setState(() {
+                          _selectedLanguage = selectedLang['value']!;
+                        });
+                      },
+                      fieldViewBuilder: (
+                        context,
+                        controller,
+                        focusNode,
+                        onEditingComplete,
+                      ) {
+                        return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: const InputDecoration(
+                            labelText: 'Selecione o idioma',
+                            border: OutlineInputBorder(),
+                          ),
+                          onEditingComplete: onEditingComplete,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Idioma selecionado: $_selectedLanguage',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
