@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:translator/translator.dart';
@@ -57,6 +56,7 @@ class _AppTranslatorState extends State<AppTranslator> {
 
   String translatedText = '';
   String _selectedLanguage = 'en';
+  String _selectedLanguageLabel = 'Inglês';
 
   final List<Map<String, String>> languages = [
     {'value': 'de', 'label': 'Alemão'},
@@ -146,6 +146,10 @@ class _AppTranslatorState extends State<AppTranslator> {
               );
             },
             child: Image.asset('assets/img/translator_logo.png', width: 100),
+            hoverColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
           ),
         ],
         backgroundColor: const Color(0XFF004AAD),
@@ -157,6 +161,96 @@ class _AppTranslatorState extends State<AppTranslator> {
             builder: (context, constraints) {
               bool isWide = constraints.maxWidth > 600;
 
+              Widget optionsDropdown = SizedBox(
+                width: 300,
+                child: Autocomplete<String>(
+                  optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text.isEmpty) {
+                      return languages.map((lang) => lang['label']!);
+                    }
+                    return languages
+                        .map((lang) => lang['label']!)
+                        .where(
+                          (option) => option.toLowerCase().contains(
+                            textEditingValue.text.toLowerCase(),
+                          ),
+                        )
+                        .take(50); // opcional: limite geral para performance
+                  },
+                  optionsViewBuilder: (context, onSelected, options) {
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        elevation: 4.0,
+                        child: Container(
+                          width: 300,
+                          constraints: BoxConstraints(maxHeight: 300),
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            itemCount: options.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final option = options.elementAt(index);
+                              return ListTile(
+                                title: Text(option),
+                                onTap: () {
+                                  onSelected(option);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  onSelected: (String selection) {
+                    final selectedLang = languages.firstWhere(
+                      (lang) => lang['label'] == selection,
+                      orElse: () => {'value': '', 'label': ''},
+                    );
+
+                    setState(() {
+                      _selectedLanguage = selectedLang['value']!;
+                      _selectedLanguageLabel = selectedLang['label']!;
+                    });
+                  },
+                  fieldViewBuilder: (
+                    context,
+                    controller,
+                    focusNode,
+                    onEditingComplete,
+                  ) {
+                    return Center(
+                      child: SizedBox(
+                        width: 150,
+                        height: 50,
+                        child: TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.blueAccent.withOpacity(0.3),
+                            labelText: _selectedLanguageLabel,
+                            labelStyle: TextStyle(color: Color(0XFF004AAD)),
+                            floatingLabelBehavior: FloatingLabelBehavior.auto,
+                            floatingLabelAlignment:
+                                FloatingLabelAlignment.center,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0XFF004AAD)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Color(0XFF004AAD)),
+                            ),
+                          ),
+                          style: TextStyle(color: Color(0XFF004AAD)),
+                          onEditingComplete: onEditingComplete,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+
               Widget inputColumn = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -164,12 +258,14 @@ class _AppTranslatorState extends State<AppTranslator> {
                     width: 300,
                     height: 300,
                     child: TextField(
-                      maxLength: 4000,
-                      maxLines: null,
+                      maxLength: 500,
+                      maxLines: 10,
                       controller: _textController,
                       decoration: const InputDecoration(
-                        labelText: 'Digite o texto ou use a câmera',
+                        hintText: 'Digite o texto ou use a câmera',
                         border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Color.fromARGB(25, 68, 137, 255),
                         counterText: '',
                       ),
                     ),
@@ -186,10 +282,12 @@ class _AppTranslatorState extends State<AppTranslator> {
                     height: 300,
                     child: TextField(
                       readOnly: true,
-                      maxLines: null,
+                      maxLines: 10,
                       controller: TextEditingController(text: translatedText),
                       decoration: const InputDecoration(
-                        labelText: 'Tradução',
+                        hintText: 'Tradução',
+                        filled: true,
+                        fillColor: Color.fromARGB(25, 68, 137, 255),
                         border: OutlineInputBorder(),
                       ),
                       style: const TextStyle(fontSize: 16),
@@ -206,6 +304,8 @@ class _AppTranslatorState extends State<AppTranslator> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     inputColumn,
+                    const SizedBox(height: 32),
+                    optionsDropdown,
                     const SizedBox(width: 32),
                     outputColumn,
                   ],
@@ -215,6 +315,7 @@ class _AppTranslatorState extends State<AppTranslator> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     inputColumn,
+                    optionsDropdown,
                     const SizedBox(height: 24),
                     outputColumn,
                   ],
@@ -224,12 +325,6 @@ class _AppTranslatorState extends State<AppTranslator> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    "Tradutor de Texto",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 24),
-                  mainContent,
                   const SizedBox(height: 24),
                   Center(
                     child: Row(
@@ -246,6 +341,12 @@ class _AppTranslatorState extends State<AppTranslator> {
                             "Traduzir",
                             style: TextStyle(color: Color(0XFF004AAD)),
                           ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent.withOpacity(
+                              0.3,
+                            ), // fundo semi-transparente
+                            elevation: 0,
+                          ),
                         ),
                         Padding(padding: EdgeInsets.only(left: 16)),
                         ElevatedButton.icon(
@@ -258,62 +359,20 @@ class _AppTranslatorState extends State<AppTranslator> {
                             "Usar Câmera",
                             style: TextStyle(color: Color(0XFF004AAD)),
                           ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent.withOpacity(
+                              0.3,
+                            ), // fundo semi-transparente
+                            elevation: 0,
+                          ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 24),
+                  mainContent,
+                  const SizedBox(height: 24),
                   Padding(padding: EdgeInsets.only(top: 16)),
-                  SizedBox(
-                    width: 300,
-                    child: Autocomplete<String>(
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        if (textEditingValue.text.isEmpty) {
-                          return const Iterable<String>.empty();
-                        }
-                        return languages
-                            .map((lang) => lang['label']!)
-                            .where(
-                              (label) => label.toLowerCase().contains(
-                                textEditingValue.text.toLowerCase(),
-                              ),
-                            );
-                      },
-                      onSelected: (String selection) {
-                        final selectedLang = languages.firstWhere(
-                          (lang) => lang['label'] == selection,
-                          orElse: () => {'value': '', 'label': ''},
-                        );
-
-                        setState(() {
-                          _selectedLanguage = selectedLang['value']!;
-                        });
-                      },
-                      fieldViewBuilder: (
-                        context,
-                        controller,
-                        focusNode,
-                        onEditingComplete,
-                      ) {
-                        return TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          decoration: const InputDecoration(
-                            labelText: 'Selecione o idioma',
-                            border: OutlineInputBorder(),
-                          ),
-                          onEditingComplete: onEditingComplete,
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Idioma selecionado: $_selectedLanguage',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ],
               );
             },
@@ -333,6 +392,7 @@ class EasterEgg extends StatelessWidget {
       appBar: AppBar(
         title: Text('Easter Egg', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0XFF004AAD),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Center(child: Image.asset('assets/img/easter_egg.png')),
       backgroundColor: Colors.white,
