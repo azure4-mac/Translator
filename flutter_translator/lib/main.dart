@@ -175,7 +175,7 @@ class _AppTranslatorState extends State<AppTranslator> {
                             textEditingValue.text.toLowerCase(),
                           ),
                         )
-                        .take(50); // opcional: limite geral para performance
+                        .take(50);
                   },
                   optionsViewBuilder: (context, onSelected, options) {
                     return Align(
@@ -344,7 +344,7 @@ class _AppTranslatorState extends State<AppTranslator> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blueAccent.withOpacity(
                               0.3,
-                            ), // fundo semi-transparente
+                            ),
                             elevation: 0,
                           ),
                         ),
