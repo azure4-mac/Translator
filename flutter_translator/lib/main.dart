@@ -342,9 +342,13 @@ class _AppTranslatorState extends State<AppTranslator> {
                           ),
                           style: ElevatedButton.styleFrom(
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                             backgroundColor: Colors.blueAccent.withOpacity(
                               0.3,
                             ),
+=======
+                            backgroundColor: Colors.blueAccent.withOpacity(0.3),
+>>>>>>> Stashed changes
 =======
                             backgroundColor: Colors.blueAccent.withOpacity(0.3),
 >>>>>>> Stashed changes
