@@ -259,7 +259,7 @@ class _AppTranslatorState extends State<AppTranslator> {
                     height: 300,
                     child: TextField(
                       maxLength: 500,
-                      maxLines: 10,
+                      maxLines: 13,
                       controller: _textController,
                       decoration: const InputDecoration(
                         hintText: 'Digite o texto ou use a câmera',
@@ -282,7 +282,7 @@ class _AppTranslatorState extends State<AppTranslator> {
                     height: 300,
                     child: TextField(
                       readOnly: true,
-                      maxLines: 10,
+                      maxLines: 13,
                       controller: TextEditingController(text: translatedText),
                       decoration: const InputDecoration(
                         hintText: 'Tradução',
@@ -316,12 +316,11 @@ class _AppTranslatorState extends State<AppTranslator> {
                   children: [
                     inputColumn,
                     optionsDropdown,
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 40),
                     outputColumn,
                   ],
                 );
               }
-
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -342,9 +341,13 @@ class _AppTranslatorState extends State<AppTranslator> {
                             style: TextStyle(color: Color(0XFF004AAD)),
                           ),
                           style: ElevatedButton.styleFrom(
+<<<<<<< Updated upstream
                             backgroundColor: Colors.blueAccent.withOpacity(
                               0.3,
                             ),
+=======
+                            backgroundColor: Colors.blueAccent.withOpacity(0.3),
+>>>>>>> Stashed changes
                             elevation: 0,
                           ),
                         ),
@@ -360,9 +363,7 @@ class _AppTranslatorState extends State<AppTranslator> {
                             style: TextStyle(color: Color(0XFF004AAD)),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent.withOpacity(
-                              0.3,
-                            ), // fundo semi-transparente
+                            backgroundColor: Colors.blueAccent.withOpacity(0.3),
                             elevation: 0,
                           ),
                         ),
@@ -390,11 +391,63 @@ class EasterEgg extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Easter Egg', style: TextStyle(color: Colors.white)),
+        title: Text(
+          'Obrigado pela atenção',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color(0XFF004AAD),
         iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: Center(child: Image.asset('assets/img/easter_egg.png')),
+      body: Column(
+        children: [
+          Center(child: Image.asset('assets/img/easter_egg.png')),
+          const SizedBox(height: 48),
+          Center(
+            child: Text(
+              'Desnvolvido por: Bruno Essing Barboza e Jailson Stein — 3F',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Center(
+            child: Text(
+              'Desenvolvimento para Dispositivos Móveis',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: Text(
+              'Instituto Federal Catarinense - Campus Concordia',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 72),
+          Center(
+            child: Padding(
+              child: Row(
+                children: [
+                  Image.asset('assets/img/translator_logo.png', width: 125),
+                  const SizedBox(width: 16),
+                  Image.asset('assets/img/Logo-IFC-Concórdia.png', width: 125),
+                ],
+              ),
+              padding: EdgeInsets.only(left: 100),
+            ),
+          ),
+        ],
+      ),
       backgroundColor: Colors.white,
     );
   }

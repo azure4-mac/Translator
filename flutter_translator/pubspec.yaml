@@ -53,6 +53,7 @@ flutter:
   assets:
     - assets/img/translator_logo.png
     - assets/img/easter_egg.png
+    - assets/img/Logo-IFC-Concórdia.png
   # Para adicionar fontes personalizadas, edite o bloco abaixo:
   # fonts:
   #   - family: NomeDaFonte
